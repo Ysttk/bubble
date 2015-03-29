@@ -187,8 +187,8 @@ function PlayScene:ctor(sceneName)
                                           print("Contact", contact)
                                           end, cc.Handler.EVENT_PHYSICS_CONTACT_BEGIN)
 
-local eventDispatcher = self:getEventDispatcher()
-eventDispatcher:addEventListenerWithSceneGraphPriority(self.contactListener, self);
+	local eventDispatcher = self:getEventDispatcher()
+	eventDispatcher:addEventListenerWithSceneGraphPriority(self.contactListener, self);
     --cc.Director:getInstance():getEventDispatcher():addEventListenerWithSceneGraphPriority(self.contactListener, layer)
 
     self:getPhysicsWorld():setDebugDrawMask(

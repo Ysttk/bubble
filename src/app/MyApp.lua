@@ -11,7 +11,10 @@ end
 
 function MyApp:run()
     cc.FileUtils:getInstance():addSearchPath("res/")
-    self:enterScene("PlayScene", {"Scene548"})
+    cc.FileUtils:getInstance():addSearchPath("src/app/tools/")
+    cc.FileUtils:getInstance():addSearchPath("src/app/model/")
+    --self:enterScene("PlayScene", {"Scene548"})
+    self:enterScene("DustScene", {})
 end
 
 return MyApp
