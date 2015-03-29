@@ -1,4 +1,4 @@
-
+require ("i18n/Message_cn")
 require ("Group")
 require ("World")
 
@@ -149,31 +149,31 @@ function DustScene:ctor()
 	local statusFont = "Arial"
 
 	local posX = 0
-	local timeLbl = cc.LabelTTF:create("Time", statusFont, 24)
+	local timeLbl = cc.LabelTTF:create("Time", statusFont, 12)
 	timeLbl:setPosition(posX, 0)
 	timeLbl:setAnchorPoint(0, 0)
 	statusGroup:addUIObj(timeLbl)
 
 	posX = posX + lblWidth
-	local visiableLbl = cc.LabelTTF:create("Visiable", statusFont, 24)
+	local visiableLbl = cc.LabelTTF:create("Visiable", statusFont, 12)
 	visiableLbl:setPosition(posX, 0)
 	visiableLbl:setAnchorPoint(0, 0)
 	statusGroup:addUIObj(visiableLbl)
 
 	posX = posX + lblWidth
-	local personNumLbl = cc.LabelTTF:create("Person", statusFont, 24)
+	local personNumLbl = cc.LabelTTF:create("Person", statusFont, 12)
 	personNumLbl:setPosition(posX, 0)
 	personNumLbl:setAnchorPoint(0, 0)
 	statusGroup:addUIObj(personNumLbl)
 
 	posX = posX + lblWidth
-	local fogIncRateLbl = cc.LabelTTF:create("FogIncRate", statusFont, 24)
+	local fogIncRateLbl = cc.LabelTTF:create("FogIncRate", statusFont, 12)
 	fogIncRateLbl:setPosition(posX, 0)
 	fogIncRateLbl:setAnchorPoint(0, 0)
 	statusGroup:addUIObj(fogIncRateLbl)
 
 	posX = posX + lblWidth
-	local fogThickLbl = cc.LabelTTF:create("FogThick", statusFont, 24)
+	local fogThickLbl = cc.LabelTTF:create("FogThick", statusFont, 12)
 	fogThickLbl:setPosition(posX, 0)
 	fogThickLbl:setAnchorPoint(0, 0)
 	statusGroup:addUIObj(fogThickLbl)
@@ -224,9 +224,28 @@ function DustScene:ctor()
 	self:addChild(progress_layer)
 	self:addChild(op_layer)
 
+	WorldModel:Init(10000, 0.05, 0.005, 1)
+
+	local function UpdateWordInfo(worldModel)
+		local seconds = math.floor(worldModel.T % 60)
+		local minite = math.floor((worldModel.T / 60) % 60)
+		local hour = math.floor(worldModel.T / 3600)
+		timeLbl:setString(Message.Time..hour..":"..minite..":"..seconds)
+		
+		visiableLbl:setString(Message.CanSee..string.format("%.2f", worldModel.Brightness))
+		
+		personNumLbl:setString(Message.PeopleNum..math.floor(worldModel.PeopleNum))
+
+		fogIncRateLbl:setString(Message.FogIncSpeed..string.format("%.2f", worldModel.FogIncDegree))
+
+		fogThickLbl:setString(Message.FogThickness..string.format("%.2f", worldModel.FogThickness))
+	end
+
 	cc.Director:getInstance():getScheduler():scheduleScriptFunc(
 		function (deltaT) 
 			ProgressMgr:OnTick(deltaT) 
+			WorldModel:OnTick(deltaT)
+			UpdateWordInfo(WorldModel)
 		end, 0, false)
 
 end
