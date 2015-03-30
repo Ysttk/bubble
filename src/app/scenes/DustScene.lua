@@ -139,9 +139,11 @@ function DustScene:ctor()
 	local op_layer = cc.Layer:create()
 	
 	local statusGroup = UIGroup:new(op_layer)
+	statusGroup:setAnchor(0, 0)
 
 	local posY = 40
 	statusGroup:setPos(originSize.x, originSize.y+visibleSize.height-posY)
+	print("status group:", originSize.x, originSize.y)
 
 	local segmentNum = 5
 	local lblWidth = visibleSize.width/segmentNum

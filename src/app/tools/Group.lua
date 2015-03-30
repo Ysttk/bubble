@@ -1,6 +1,8 @@
 
 require ("Common")
+
 --gui group definition
+--用于管理一堆的当做ui widget用的sprite
 UIGroup = {}
 UIGroupMgr = {}
 
@@ -128,6 +130,8 @@ function UIGroup:clearAll()
 	self.rect.size = {0,0}
 end
 
+-- StackUIGroup 支持自动坐标排列，用户只需要调用pushUIObj
+-- StackUIGroup自动将widget插入显示在最下面
 StackUIGroup = {}
 StackUIGroup.clearAll = UIGroup.clearAll
 
