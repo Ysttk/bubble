@@ -1,5 +1,5 @@
 
-require ("Common")
+require ("tools/Common")
 
 --gui group definition
 --用于管理一堆的当做ui widget用的sprite
