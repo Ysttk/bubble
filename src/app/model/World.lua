@@ -38,5 +38,8 @@ function WorldModel:OnTick(deltaTime)
 	self.Brightness = self.FogThickness/2
 end
 
-
+function WorldModel:OnKouZhaoTakeEffect()
+	self.FogThickness = self.FogThickness - 0.1
+	if self.FogThickness<0 then self.FogThickness=0 end
+end
 

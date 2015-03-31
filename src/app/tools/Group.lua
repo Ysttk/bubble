@@ -56,7 +56,12 @@ function UIGroup:addUIObj(obj)
 	end
 	table.insert(self.widgets, obj)
 	local layer = UIGroupMgr.groups[self]
-	layer:addChild(obj)
+	--layer:addChild(obj)
+	if obj.addChild then -- obj是一个Node（这里是Sprite）
+		layer:addChild(obj)
+	elseif obj.addWidgetToLayer then -- obj是一个自定义实现了StyleBarInterface的类型
+		obj:addWidgetToLayer(layer)
+	end
 end
 
 function UIGroup:setPos(x,y)

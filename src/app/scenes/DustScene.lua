@@ -12,17 +12,117 @@ function ProgressMgr:CreateWidgetGroupWithLayer(layer)
 	self.widgetGroup:setAnchor(0, 0)
 end
 
+StyleBarInterface = {}
+function StyleBarInterface:addWidgetToLayer(layer)
+end
+
+function StyleBarInterface:getContentSize()
+end
+
+function StyleBarInterface:removeFromParent()
+end
+
+function StyleBarInterface:setPercent(percent)
+end
+
+function StyleBarInterface:getPosition()
+end
+
+function StyleBarInterface:adjustLblPosition()
+end
+
+function StyleBarInterface:setPosition(x, y)
+end
+
+function StyleBarInterface:setAnchorPoint(x, y)
+end
+
+
+-- @implement: StyleBarInterface
+DefaultStyleBar = {}
+
+function DefaultStyleBar:new()
+	local newObj = DeepCopy(DefaultStyleBar)
+	newObj.new = nil
+	newObj.clone = DefaultStyleBar.new
+	newObj.backgroupBar = cc.Sprite:create("progress.png")
+	newObj.percentLbl = cc.LabelTTF:create("100", "Arial", 12)
+	newObj.X, newObj.Y = 0,0
+	local size = newObj.backgroupBar:getContentSize()
+	newObj.TotalWidth = size.width
+	return newObj
+end
+
+function DefaultStyleBar:addWidgetToLayer(layer)
+	layer:addChild(self.backgroupBar)
+	layer:addChild(self.percentLbl)
+	StyleBarInterface.addWidgetToLayer(self, layer)
+end
+
+function DefaultStyleBar:getContentSize()
+	return self.backgroupBar:getContentSize()
+end
+
+function DefaultStyleBar:removeFromParent()
+	self.backgroupBar:removeFromParent()
+	self.percentLbl:removeFromParent()
+end
+
+function DefaultStyleBar:setPercent(percent)
+	local size = self.backgroupBar:getContentSize()
+	self.backgroupBar:setTextureRect({
+		x = 0, y = 0,
+		width = math.floor(percent*self.TotalWidth),
+		height = size.height,
+	})
+	local percentStr = string.format("%.1f%%", percent*100)
+	self.percentLbl:setString(percentStr)
+end
+
+function DefaultStyleBar:getPosition()
+	return self.backgroupBar:getPosition()
+end
+
+function DefaultStyleBar:adjustLblPosition()
+	local x,y = self.backgroupBar:getPosition()
+	local backAnchor = self.backgroupBar:getAnchorPoint()
+	local backAnchorX, backAnchorY = backAnchor.x, backAnchor.y
+	local size = self.backgroupBar:getContentSize()
+	local width, height = self.TotalWidth, size.height
+	local centerX, centerY = x+(0.5-backAnchorX)*width, y+(0.5-backAnchorY)*height
+	self.percentLbl:setAnchorPoint(0.5, 0.5)
+	self.percentLbl:setPosition(centerX,centerY)
+end
+
+function DefaultStyleBar:setPosition(x, y)
+	self.X, self.Y = x,y
+	self.backgroupBar:setPosition(x,y)
+	self:adjustLblPosition()
+end
+
+function DefaultStyleBar:setAnchorPoint(x, y)
+	self.AnchorX, self.AnchorY = x,y
+	self.backgroupBar:setAnchorPoint(x, y)
+	self:adjustLblPosition()
+	--self.percentLbl:setAnchorPoint(x, y)
+end
+
+
 function ProgressMgr:CreateDefaultStyleBar()
-	local progressName = "progress.png"
-	local widget = cc.Sprite:create(progressName)
+	--local progressName = "progress.png"
+	--local widget = cc.Sprite:create(progressName)
+	--local percentLbl = cc.LabelTTF:create("100", "Arial", 12)
+	local widget = DefaultStyleBar:new()
+	widget:setPercent(0)
 	local function defaultUpdate(widget, widgetSize, percent)
-		local w = widgetSize.width * percent
-		widget:setTextureRect({
-			["x"] = 0, 
-			["y"] = 0, 
-			["width"] = w, 
-			["height"] = widgetSize.height,
-		})
+		--local w = widgetSize.width * percent
+		--widget:setTextureRect({
+		--	["x"] = 0, 
+		--	["y"] = 0, 
+		--	["width"] = w, 
+		--	["height"] = widgetSize.height,
+		--})
+		widget:setPercent(percent)
 	end
 	return widget, defaultUpdate
 end
@@ -65,12 +165,13 @@ function ProgressMgr:AddItem(duration, barStyleInfo, notifyFunc, ...)
 		},
 		["update"] = updateFunc,
 	}
-	progressWidget:setTextureRect({
-		["x"] = 0, 
-		["y"] = 0, 
-		["width"] = 0, 
-		["height"] = size.height,
-	})
+	--progressWidget:setTextureRect({
+	--	["x"] = 0, 
+	--	["y"] = 0, 
+	--	["width"] = 0, 
+	--	["height"] = size.height,
+	--})
+	progressWidget:setPercent(0)
 	self.widgetGroup:pushUIObj(progressWidget)
 	return progressHandler
 end
@@ -143,7 +244,6 @@ function DustScene:ctor()
 
 	local posY = 40
 	statusGroup:setPos(originSize.x, originSize.y+visibleSize.height-posY)
-	print("status group:", originSize.x, originSize.y)
 
 	local segmentNum = 5
 	local lblWidth = visibleSize.width/segmentNum
@@ -261,7 +361,12 @@ function DoKouZhao.onTouchEvent(widget, event)
 	elseif (event.name == "ended") then
 		widget:setScale(1)
 		local duration = math.random(1, 10)
-		ProgressMgr:AddItem(duration, ProgressMgr.Style.DefaultStyle)
+		ProgressMgr:AddItem(duration, ProgressMgr.Style.DefaultStyle,
+			function (leftDuration)
+				if (leftDuration <= 0) then
+					WorldModel:GetInstance():OnKouZhaoTakeEffect()
+				end
+			end)
 	end
 	return true
 end
