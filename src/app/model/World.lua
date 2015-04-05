@@ -43,3 +43,7 @@ function WorldModel:OnKouZhaoTakeEffect()
 	if self.FogThickness<0 then self.FogThickness=0 end
 end
 
+function WorldModel:OnXinCaiLiaoTakeEffect()
+	
+end
+
